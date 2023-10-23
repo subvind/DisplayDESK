@@ -1,169 +1,236 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import jwt_decode from 'jwt-decode';
 
-  import Sidebar from "./Sidebar.svelte"
+	export let organization: any;
 
-  let decodedToken: any = null;
-  let user: any;
-  let organization: any;
-  let account: any;
+	let playlists: any;
 
-  function verifyUser (user: any) {
-    if (user.authStatus === 'Pending') {
-    // Check if you're already on the verification page to avoid infinite redirects
-    if (window.location.pathname !== '/email-verification') {
-      // Redirect to the verification page
-      window.location.href = '/email-verification';
-    }
-    // If already on the verification page, do nothing
-    }
-  }
+	onMount(async () => {
+    var elems = document.querySelectorAll('.sidenav');
+    var instances = M.Sidenav.init(elems, {});
 
-  async function load() {
-    if (decodedToken.type === 'user') {
-      const response = await fetch(`https://api.subvind.com/users/username/${decodedToken.username}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        }
-      });
-  
-      if (response.ok) {
-        user = await response.json();
-        verifyUser(user)
-      } else {
-        const errorData = await response.json();
-        alert(errorData.error);
-      }
-    }
+		let tubeHostname = window.location.hostname
+		if (tubeHostname === 'localhost') {
+			tubeHostname = 'videos.subvind.com'
+		}
+		// TODO: playlists
+    // const response = await fetch(`https://api.subvind.com/playlists/tubeHostname/${tubeHostname}`, {
+    //   method: 'GET',
+    //   headers: {
+    //     'Content-Type': 'application/json',
+    //   }
+    // });
 
-    if (decodedToken.type === 'account') {
-      /**
-       * type === 'account'
-       **/ 
-      const response2 = await fetch(`https://api.subvind.com/organizations/orgname/${decodedToken.orgname}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        }
-      });
-  
-      if (response2.ok) {
-        organization = await response2.json();
-      } else {
-        const errorData = await response2.json();
-        alert(errorData.error);
-      }
+    // if (response.ok) {
+    //   playlists = await response.json();
+    // } else {
+		// 	const errorData = await response.json();
+    //   alert(errorData.error);
+    // }
 
-      const response3 = await fetch(`https://api.subvind.com/accounts/accountname/${decodedToken.accountname}/${organization.id}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        }
-      });
-  
-      if (response3.ok) {
-        account = await response3.json();
-      } else {
-        const errorData = await response3.json();
-        alert(errorData.error);
-      }
-    }
-  }
+		setTimeout(() => {
+			let elems1 = document.querySelectorAll('.tabs')
+			var instance = M.Tabs.init(elems1, {});
+	
+			var elems2 = document.querySelectorAll('.collapsible');
+			var instances = M.Collapsible.init(elems2, {});
 
-  onMount(async () => {
-    let accessToken: any = localStorage.getItem('access_token');
-
-    // Decode the JWT
-    decodedToken = jwt_decode(accessToken);
-
-    await load()
-  })
+			var elems3 = document.querySelectorAll('.dropdown-trigger');
+			var instances = M.Dropdown.init(elems3, {
+				constrainWidth: false,
+			});
+		}, 0)
+	})
 </script>
 
-<nav class="black">
-  <div class="nav-wrapper">
-    {#if user}
-      {#if user.authStatus === 'Pending'}
-        <!-- show nothing -->
-      {:else}
-        {#if user.defaultOrganization}
-          <Sidebar decodedToken={decodedToken} person={user} />
-        {:else}
-          <ul id="nav-mobile" class="left hide-on-med-and-down">
-            <li><a href={`/${decodedToken.username}#organizations`}>select organization</a></li>
-          </ul>
-        {/if}
-      {/if}
-    {/if}
+<header>
+	<nav class="grey darken-3">
+		<div class="nav-wrapper">
+			<ul id="slide-out" class="sidenav">
+				<nav class="grey darken-3" style="max-height: 64px;">
+					<div class="nav-wrapper">
+						{#if organization}
+							<a href="/" target="_self" class="brand-logo" style="width: 100%; text-align: center;">{organization.shortName || 'MEDIATUBE'}</a>
+						{/if}
+					</div>
+				</nav>
+				{#if organization}
+					<div class="describe">
+						{organization.description}
+					</div>
+				{/if}
+				
+				<li><div class="divider"></div></li>
+				<li><a class="subheader">Playlists</a></li>
+				<li class="black-text">
+					<ul class="collapsible">
+						{#if playlists}
+							{#each playlists.data as playlist}
+								{#if !playlist.parentPlaylist}
+									<li>
+										<div class="collapsible-header">{playlist.name}</div>
+										<div class="collapsible-body">
+											{#if playlist.subCategories}
+												{#each playlist.subCategories as subPlaylist}
+													<li><a class="waves-effect" href={`/playlists/${subPlaylist.slug}`} target="_self"><i class="material-icons">subdirectory_arrow_right</i>{subPlaylist.name}</a></li>
+												{/each}
+											{/if}
+										</div>
+									</li>
+								{/if}
+							{/each}
+						{/if}
+					</ul>
+				</li>			
+				
+				<li><div class="divider"></div></li>
+				<li><a class="subheader">Menu</a></li>
+				{#if organization.homepageLink}
+					<li><a href={organization.homepageLink || '/'} target="_self" class="waves-effect" ><i class="material-icons">home</i>Homepage</a></li>
+				{/if}
+				{#if organization.isErpModule}
+					{#if organization.erpHostname}
+						<li><a href={`https://${organization.erpHostname}`} target="_self" class="waves-effect"><i class="material-icons">local_grocery_store</i>Store</a></li>
+					{:else}
+						<li><a href={`https://${organization.orgname}.erpnomy.com`} target="_self" class="waves-effect"><i class="material-icons">local_grocery_store</i>Store</a></li>
+					{/if}
+				{/if}
+				{#if organization.isTubeModule}
+					{#if organization.tubeHostname}
+						<li><a href={`https://${organization.tubeHostname}/playlists`} target="_self" class="waves-effect"><i class="material-icons">videocam</i>Videos</a></li>
+					{:else}
+						<li><a href={`https://${organization.orgname}.tubenomy.com/playlists`} target="_self" class="waves-effect"><i class="material-icons">videocam</i>Videos</a></li>
+					{/if}
+				{/if}
+				{#if organization.isDeskModule}
+					{#if organization.deskHostname}
+						<li><a href={`https://${organization.deskHostname}`} target="_self" class="waves-effect"><i class="material-icons">verified_user</i>Client Area</a></li>
+					{:else}
+						<li><a href={`https://${organization.orgname}.desknomy.com`} target="_self" class="waves-effect"><i class="material-icons">verified_user</i>Client Area</a></li>
+					{/if}
+				{/if}
+				{#if organization.contactCenterEmail}
+					<li><a href="/contact-center" target="_self" class="waves-effect"><i class="material-icons">local_phone</i>Contact Center</a></li>
+				{/if}
+				
+				<li><div class="divider"></div></li>
+				<li><a class="subheader">Extra</a></li>
+				<li><a class="waves-effect" href="/privacy-policy" target="_self">Privacy Policy</a></li>
+				<li><a class="waves-effect" href="/terms-and-conditions" target="_self">Terms & Conditions</a></li>
+			</ul>
+			{#if organization}
+				<a href="#" data-target="slide-out" class="brand-logo sidenav-trigger left"><i class="material-icons">menu</i>{organization.displayName}</a>
+			{/if}
 
-    {#if account}
-      <Sidebar decodedToken={decodedToken} person={account} />
-    {/if}
-    
-    {#if !decodedToken}
-      <ul id="nav-mobile" class="left hide-on-med-and-down">
-        <li><a href="https://subvind.com" target="_blank">powered by subvind</a></li>
-      </ul>
-    {/if}
+			<ul id="nav-mobile" class="right">
+				<!-- Dropdown Trigger -->
+				<li>
+					<div class="logo">
+						{#if organization}
+							{#if organization.orgPhoto}
+								<img src={`https://s3.us-east-2.amazonaws.com/${organization.orgname}.${organization.orgPhoto.bucket.name}/${organization.orgPhoto.filename}`} alt="logo" class="dropdown-trigger" data-target='dropdown1'>
+							{:else}
+								<img src="/anchor.png" alt="logo" class="dropdown-trigger" data-target='dropdown1'>
+							{/if}
+						{/if}
+					</div>
+				</li>
 
-    <a href="/" class="brand-logo center"><span class="yellow">nomy</span>.<span class="red">DESK</span></a>
+				<!-- Dropdown Structure -->
+				<ul id='dropdown1' class='dropdown-content'>
+					{#if organization}
+						{#if organization.ebayUser}
+							<li><a href={`https://www.ebay.com/usr/${organization.ebayUser}`} target="_blank">ebay.com/usr/{organization.ebayUser}</a></li>
+						{/if}
+						{#if organization.etsyShop}
+							<li><a href={`https://www.etsy.com/shop/${organization.etsyShop}`} target="_blank">etsy.com/shop/{organization.etsyShop}</a></li>
+						{/if}
+						{#if organization.youtubeChannel}
+							<li><a href={`https://www.youtube.com/${organization.youtubeChannel}`} target="_blank">youtube.com/{organization.youtubeChannel}</a></li>
+						{/if}
+					{/if}
+				</ul>
+			</ul>
+		</div>
+	</nav>
+</header>
 
-    {#if user}
-      {#if user.authStatus === 'Pending'}
-        <!-- show nothing -->
-      {:else}
-        <ul id="nav-mobile" class="right hide-on-med-and-down">
-          <li><a href="/users"><span class="yellow">users</span></a></li>
-          <li><a href={`/${decodedToken.username}`}>{decodedToken.fullName}</a></li>
-          <li><a href="/organizations"><span class="yellow">organizations</span></a></li>
-          {#if user.defaultOrganization}
-            <li><a href={`/${decodedToken.username}/${user.defaultOrganization.orgname}`}>{user.defaultOrganization.displayName}</a></li>
-          {/if}
-        </ul>
-      {/if}
-    {/if}
-
-    {#if account}
-      <ul id="nav-mobile" class="right hide-on-med-and-down">
-        <li><a href={`/${decodedToken.ownername}/${decodedToken.orgname}#employees`}><span class="yellow">accounts</span></a></li>
-        <li><a href={`/${decodedToken.ownername}/${decodedToken.orgname}/accounts/${decodedToken.accountname}`}>{decodedToken.fullName}</a></li>
-        <li><a href="/organizations"><span class="yellow">organizations</span></a></li>
-        {#if account.organization}
-          <li><a href={`/${decodedToken.ownername}/${decodedToken.orgname}`}>{account.organization.displayName}</a></li>
-        {/if}
-      </ul>
-    {/if}
-
-    {#if !decodedToken}
-      <ul id="nav-mobile" class="right hide-on-med-and-down">
-        <li><a href="/auth/login">login</a></li>
-        <li><a href="/auth/register">register</a></li>
-      </ul>
-    {/if}
-  </div>
-</nav>
 
 <style>
-  .yellow {
-    color: yellow;
-    background-color: transparent !important;
-  }
-  .green {
-    color: green;
-    background-color: transparent !important;
-  }
-  .blue {
-    color: #039be5;
-    background-color: transparent !important;
-  }
-  .red {
-    color: red;
-    background-color: transparent !important;
-  }
-  .purple {
-    color: purple;
-    background-color: transparent !important;
-  }
+	.logo {
+		max-height: 3.2em;
+		width: 3.2em;
+		margin: 0.5em 0.5em 0;
+		border-radius: 10em;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+	}
+
+	.logo img {
+    width: auto;
+    max-width: 100%;
+    object-fit: contain;
+	}
+
+	nav .sidenav-trigger {
+		display: initial !important;
+	}
+	
+	.describe {
+    margin: 0px 0.5em;
+    color: rgb(17, 17, 17);
+    line-height: 2em;
+    text-align: center;
+	}
+
+	.collapsible-header {
+		height: 3.2em;
+		padding: 0 32px;
+	}
+
+	.container {
+		margin: 0 auto;
+		background: #333;
+		padding: 1em;
+		padding-bottom: 0;
+		color: #ccc;
+		position: relative;
+		border: 3px solid #333;
+		border-bottom: 0px;
+		overflow: hidden;
+	}
+
+	h1 {
+		margin: 0;
+	}
+
+	p {
+		margin: 0.5em 0;
+		color: #888;
+	}
+
+	.avatar {
+		float: left;
+		width: 150px;
+		border: 3px solid #333;
+		border-radius: 10em;
+		margin-right: 1em;
+	}
+
+	.banner {
+		width: 100%;
+		height: 400px;
+		min-width: 938px;
+		overflow: hidden;
+		display: flex;
+		align-items: center;
+		margin-bottom: -6em;
+		border-bottom: 3px solid #333;
+	}
+
+	.banner img {
+		width: 100%;
+	}
 </style>
