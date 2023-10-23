@@ -4,8 +4,28 @@
 
   let accessToken: any = undefined
   let decoded: any = undefined
+  let organization: any;
 
-  onMount(() => {
+  onMount(async () => {
+		let deskHostname = window.location.hostname
+		if (deskHostname === 'localhost') {
+			deskHostname = 'client-area.subvind.com'
+		}
+
+    const responseOrg = await fetch(`https://api.subvind.com/organizations/deskHostname/${deskHostname}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    });
+
+    if (responseOrg.ok) {
+      organization = await responseOrg.json();
+    } else {
+      const errorData = await responseOrg.json();
+      alert(errorData.error);
+    }
+
     accessToken = localStorage.getItem('access_token');
     decoded = jwt_decode(accessToken);
 
@@ -19,8 +39,10 @@
 </script>
 
 <svelte:head>
-  <title>Media Library Management - nomy.DESK</title> 
-  <meta name="description" content="A dangerous place to get some flow-based devgramming done." />
+  {#if organization}
+    <title>Client Area - {organization.displayName} - {organization.description}</title> 
+    <meta name="description" content={organization.detail} />
+  {/if}
 </svelte:head>
 
 <div class="banner">
@@ -37,7 +59,7 @@
         <p>Thank you for you cooperation.</p>
         <br />
         {#if accessToken}
-          <a href={`/${decoded.type === 'user' ? decoded.username : `${decoded.ownername}/${decoded.orgname}/accounts/${decoded.accountname}`}`} class="waves-effect yellow black-text lighten-2 btn username">{decoded.username || decoded.accountname}</a>
+          <a href={`/accounts/${decoded.accountname}`} class="waves-effect yellow black-text lighten-2 btn username">{decoded.accountname}</a>
           <a href="/auth/logout" class="waves-effect black white-text btn">Logout</a>
         {:else}
           <a href="/auth/login" class="waves-effect black white-text btn">Login</a>

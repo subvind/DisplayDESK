@@ -97,9 +97,9 @@
 				{/if}
 				{#if organization.isTubeModule}
 					{#if organization.tubeHostname}
-						<li><a href={`https://${organization.tubeHostname}/playlists`} target="_self" class="waves-effect"><i class="material-icons">videocam</i>Videos</a></li>
+						<li><a href={`https://${organization.tubeHostname}`} target="_self" class="waves-effect"><i class="material-icons">videocam</i>Videos</a></li>
 					{:else}
-						<li><a href={`https://${organization.orgname}.tubenomy.com/playlists`} target="_self" class="waves-effect"><i class="material-icons">videocam</i>Videos</a></li>
+						<li><a href={`https://${organization.orgname}.tubenomy.com`} target="_self" class="waves-effect"><i class="material-icons">videocam</i>Videos</a></li>
 					{/if}
 				{/if}
 				{#if organization.isDeskModule}

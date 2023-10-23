@@ -37,7 +37,7 @@
         console.log('access_token', res.access_token)
         localStorage.setItem('access_token', res.access_token);
         let decodedToken: any = jwt_decode(res.access_token);
-        window.location.href = `/${decodedToken.ownername}/${decodedToken.orgname}/accounts/${decodedToken.accountname}`
+        window.location.href = `/accounts/${decodedToken.accountname}`
       } else {
         const errorData = await response.json();
         alert(errorData.error);
