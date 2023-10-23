@@ -3,7 +3,7 @@
   import jwt_decode from 'jwt-decode';
 
   let loading: boolean = false;
-  let username = ''
+  let accountname = ''
   let firstName = ''
   let lastName = ''
 	let email = ''
@@ -15,7 +15,7 @@
 	async function register(event: any) {
     event.preventDefault()
 
-    if (username === '') return alert('Username must be defined.')
+    if (accountname === '') return alert('Accountname must be defined.')
     if (firstName === '') return alert('First name must be defined.')
     if (lastName === '') return alert('Last name must be defined.')
     if (email === '') return alert('Email must be defined.')
@@ -32,7 +32,7 @@
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          username,
+          accountname,
           firstName,
           lastName,
           email,
@@ -70,7 +70,7 @@
           console.log('decoded_token', decodedToken)
 
           // You can redirect the user to a new page or handle the success scenario in your app
-          window.location.href = `/${decodedToken.username}`
+          window.location.href = `/${decodedToken.accountname}`
         } else {
           const errorData = await response.json();
           alert(errorData.error);
@@ -123,8 +123,8 @@
     <div class="card-content">
       <div class="row">
         <div class="input-field col s12">
-          <input id="username" type="text" class="validate" bind:value={username}>
-          <label for="username">Username</label>
+          <input id="accountname" type="text" class="validate" bind:value={accountname}>
+          <label for="accountname">Username</label>
         </div>
         <div class="input-field col s6">
           <input id="firstName" type="text" class="validate" bind:value={firstName}>
