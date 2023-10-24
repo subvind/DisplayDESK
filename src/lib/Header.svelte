@@ -29,8 +29,6 @@
     // }
 
 		setTimeout(() => {
-			let elems1 = document.querySelectorAll('.tabs')
-			var instance = M.Tabs.init(elems1, {});
 	
 			var elems2 = document.querySelectorAll('.collapsible');
 			var instances = M.Collapsible.init(elems2, {});

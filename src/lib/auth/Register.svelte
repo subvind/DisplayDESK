@@ -70,7 +70,7 @@
           console.log('decoded_token', decodedToken)
 
           // You can redirect the user to a new page or handle the success scenario in your app
-          window.location.href = `/accounts/${decodedToken.accountname}`
+          window.location.href = `/portal/dashboard`
         } else {
           const errorData = await response.json();
           alert(errorData.error);

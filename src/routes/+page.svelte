@@ -59,7 +59,7 @@
         <p>Thank you for you cooperation.</p>
         <br />
         {#if accessToken}
-          <a href={`/accounts/${decoded.accountname}`} class="waves-effect yellow black-text lighten-2 btn username">{decoded.accountname}</a>
+          <a href={`/portal/accounts/${decoded.accountname}`} class="waves-effect yellow black-text lighten-2 btn username">{decoded.accountname}</a>
           <a href="/auth/logout" class="waves-effect black white-text btn">Logout</a>
         {:else}
           <a href="/auth/login" class="waves-effect black white-text btn">Login</a>
