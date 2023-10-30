@@ -3,8 +3,6 @@
 
 	export let organization: any;
 
-	let playlists: any;
-
 	onMount(async () => {
     var elems = document.querySelectorAll('.sidenav');
     var instances = M.Sidenav.init(elems, {});
@@ -57,29 +55,6 @@
 						{organization.description}
 					</div>
 				{/if}
-				
-				<li><div class="divider"></div></li>
-				<li><a class="subheader">Playlists</a></li>
-				<li class="black-text">
-					<ul class="collapsible">
-						{#if playlists}
-							{#each playlists.data as playlist}
-								{#if !playlist.parentPlaylist}
-									<li>
-										<div class="collapsible-header">{playlist.name}</div>
-										<div class="collapsible-body">
-											{#if playlist.subCategories}
-												{#each playlist.subCategories as subPlaylist}
-													<li><a class="waves-effect" href={`/playlists/${subPlaylist.slug}`} target="_self"><i class="material-icons">subdirectory_arrow_right</i>{subPlaylist.name}</a></li>
-												{/each}
-											{/if}
-										</div>
-									</li>
-								{/if}
-							{/each}
-						{/if}
-					</ul>
-				</li>			
 				
 				<li><div class="divider"></div></li>
 				<li><a class="subheader">Menu</a></li>
