@@ -35,6 +35,11 @@
     var instances = M.Dropdown.init(elems, {
       alignment: 'right'
     });
+
+		// @ts-ignore
+		gtag('event', 'pageview', {
+			'organizationId': organization.id
+		});
   })
 </script>
 
