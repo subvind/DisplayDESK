@@ -2,7 +2,7 @@
   import { onMount } from "svelte";
 
   import { HeaderDefault } from "subvind-components"
-  import { FooterCommand } from "subvind-components"
+  import Footer from "$lib/Footer.svelte"
 
 	let organization: any;
 	let deskHostname: any = '';
@@ -39,7 +39,8 @@
 
 <slot />
 
-<FooterCommand active="DESK" />
+<Footer />
+
 
 <style>
   :global(body) {
